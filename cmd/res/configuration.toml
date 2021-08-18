@@ -1,0 +1,70 @@
+[Service]
+HealthCheckInterval = '10s'
+Host = 'localhost'
+Port = 60000
+ServerBindAddr = ''  # blank value defaults to Service.Host value
+StartupMsg = 'device rest started'
+# MaxRequestSize limit the request body size in byte of put command
+MaxRequestSize = 0 # value 0 unlimit the request size.
+RequestTimeout = '5s'
+
+[KongURL]
+Server = "127.0.0.1"
+AdminPort = 8001
+AdminPortSSL = 8444
+ApplicationPort = 8000
+ApplicationPortSSL = 8443
+StatusPort = 8001
+
+[Swagger]
+BasePath="/edgex-swagger-ui"
+CoreDir="E:/ts/project/cmcc_sher/second_phase/edgex-swagger-ui/openapi/core/v2"
+DeviceSdkDir="E:/ts/project/cmcc_sher/second_phase/edgex-swagger-ui/openapi/device-sdk/v2"
+ApiGateWayHost="localhost"
+ApiGateWayPort="8000"
+[Swagger.CoreCmdPath]
+Route="core-command"
+Name=""
+FileName=""
+Port=""
+Host=""
+[Swagger.CoreMetaPath]
+Route="core-metadata"
+Name=""
+FileName=""
+Port=""
+Host=""
+[Swagger.CoreDataPath]
+Route="core-data"
+Name=""
+FileName=""
+Port=""
+Host=""
+[Swagger.NotificationPath]
+Route="support-notifications"
+Name=""
+FileName=""
+Port=""
+Host=""
+[Swagger.SysAgentPath]
+Route="sys-mgmt-agent"
+Name=""
+FileName=""
+Port=""
+Host=""
+[Swagger.SchedulerPath]
+Route="support-scheduler"
+Name=""
+FileName=""
+Port=""
+Host=""
+[[Swagger.DeviceServices]]
+Route="device-virtual"
+Name="device-virtual"
+Port=""
+Host=""
+[[Swagger.DeviceServices]]
+Route="device-virtual"
+Name="device-virtual"
+Port=""
+Host=""
