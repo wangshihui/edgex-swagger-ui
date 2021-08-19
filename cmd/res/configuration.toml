@@ -1,7 +1,9 @@
+[Writable]
+    LogLevel = 'DEBUG'
 [Service]
 HealthCheckInterval = '10s'
 Host = 'localhost'
-Port = 60000
+Port = 8080
 ServerBindAddr = ''  # blank value defaults to Service.Host value
 StartupMsg = 'device rest started'
 # MaxRequestSize limit the request body size in byte of put command
@@ -17,54 +19,74 @@ ApplicationPortSSL = 8443
 StatusPort = 8001
 
 [Swagger]
-BasePath="/edgex-swagger-ui"
-CoreDir="E:/ts/project/cmcc_sher/second_phase/edgex-swagger-ui/openapi/core/v2"
-DeviceSdkDir="E:/ts/project/cmcc_sher/second_phase/edgex-swagger-ui/openapi/device-sdk/v2"
+SwaggerPathPrefix="/edgex-swagger-ui/"
+SwaggerFileDir="swagger-ui"
+CoreDir="openapi/core/v2"
+DeviceSdkDir="openapi/device-sdk/v2"
 ApiGateWayHost="localhost"
 ApiGateWayPort="8000"
-[Swagger.CoreCmdPath]
+Proxy=false
+[[Swagger.CoreComponents]]
+Enable=true
 Route="core-command"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="core-command"
+FileName="core-command.yaml"
 Port=""
 Host=""
-[Swagger.CoreMetaPath]
+[[Swagger.CoreComponents]]
+Enable=true
 Route="core-metadata"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="core-metadata"
+FileName="core-metadata.yaml"
 Port=""
 Host=""
-[Swagger.CoreDataPath]
+[[Swagger.CoreComponents]]
+Enable=true
 Route="core-data"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="core-data"
+FileName="core-data.yaml"
 Port=""
 Host=""
-[Swagger.NotificationPath]
+[[Swagger.CoreComponents]]
+Enable=true
 Route="support-notifications"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="support-notifications"
+FileName="support-notifications.yaml"
 Port=""
 Host=""
-[Swagger.SysAgentPath]
+[[Swagger.CoreComponents]]
+Enable=true
 Route="sys-mgmt-agent"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="sys-mgmt-agent"
+FileName="support-scheduler.yaml"
 Port=""
 Host=""
-[Swagger.SchedulerPath]
+[[Swagger.CoreComponents]]
+Enable=true
 Route="support-scheduler"
-Name=""
-FileName=""
+ApiVer="/api/v2"
+Name="support-scheduler"
+FileName="support-scheduler.yaml"
 Port=""
 Host=""
-[[Swagger.DeviceServices]]
+[[Swagger.DeviceComponents]]
+Enable=true
 Route="device-virtual"
+ApiVer="/api/v2"
+FileName="device-sdk.yaml"
 Name="device-virtual"
 Port=""
 Host=""
-[[Swagger.DeviceServices]]
-Route="device-virtual"
-Name="device-virtual"
+[[Swagger.DeviceComponents]]
+Enable=true
+Route="device-rest"
+FileName="device-sdk.yaml"
+ApiVer="/api/v2"
+Name="device-rest"
 Port=""
 Host=""

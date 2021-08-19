@@ -17,22 +17,21 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
+	"context"
+	"github.com/gorilla/mux"
+	"thundersoft.com/edgex/swagger-ui/internal"
 )
 
 //
 func main() {
 	//_ = os.Setenv("EDGEX_SECURITY_SECRET_STORE", "false")
-	//ctx, cancel := context.WithCancel(context.Background())
-	//internal.Main(ctx, cancel, mux.NewRouter())
-
-	os.Mkdir("file", 0777)
-
-	http.Handle("/edgex-swagger-ui/", http.StripPrefix("/edgex-swagger-ui/", http.FileServer(http.Dir("E:\\ts\\project\\cmcc_sher\\second_phase\\edgex-swagger-ui\\swagger-ui"))))
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	ctx, cancel := context.WithCancel(context.Background())
+	internal.Main(ctx, cancel, mux.NewRouter())
+	//
+	//os.Mkdir("file", 0777)
+	//http.Handle("/edgex-swagger-ui/", http.StripPrefix("/edgex-swagger-ui/", http.FileServer(http.Dir("E:\\ts\\project\\cmcc_sher\\second_phase\\edgex-swagger-ui\\swagger-ui"))))
+	//err := http.ListenAndServe(":8080", nil)
+	//if err != nil {
+	//	log.Fatal("ListenAndServe: ", err)
+	//}
 }

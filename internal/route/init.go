@@ -8,5 +8,7 @@ import (
 
 func LoadRestRoutes( router *mux.Router, dic *di.Container)()  {
 	sv := controllers.NewHttpResServer(dic)
-
+	sv.Init()
+	sv.AddHttpSwaggerHtmlHandler(router)
+	sv.AddHttpSwaggerJsonHandler(router)
 }

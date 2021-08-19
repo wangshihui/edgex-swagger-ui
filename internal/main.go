@@ -46,9 +46,12 @@ func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
 		configuration,
 		startupTimer,
 		dic,
-		true,
+		false,
 		[]interfaces.BootstrapHandler{
+			NewBootstrap(router).BootstrapHandler,
 			httpServer.BootstrapHandler,
 			handlers.NewStartMessage("edgex-swagger-ui-security", edgex.Version).BootstrapHandler,
 		})
 }
+
+
