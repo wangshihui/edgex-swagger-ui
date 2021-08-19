@@ -224,8 +224,14 @@ func processJson(m map[string]interface{}, s string, c config.ConfiComponent, se
 	api[edgexKongAuth]=make([]string,0,1)
 	secs=append(secs,api)
 	m[swaggersecurityProperty]=secs
-
 	//m[swaggersecurityProperty]=spv
+	servers:=make([]interface{},0,1)
+
+	apiServer:=make(map[string]string)
+	apiServer["url"]=server+"/"+c.Route+"/"+c.ApiVer+"/"
+	apiServer["description"]="kong gate way"
+	servers=append(servers,apiServer)
+	m["servers"]=servers
 }
 
 func genInitJs(urls []swaggerUrl,l logger.LoggingClient,swaggerDir string) error {
