@@ -39,7 +39,6 @@ type SwaggerSecurityComponets struct {
 	ApiKeyAuth SwaggerApiKeyAuth `json:"ApiKeyAuth",yml:"ApiKeyAuth"`
 }
 
-
 type KongUrlInfo struct {
 	Server             string
 	AdminPort          int
@@ -57,6 +56,7 @@ type ConfiComponent struct {
 	FileName string
 	Host     string
 	Port     string
+	Scheme   string
 }
 
 type SwaggerConfigComponents struct {
@@ -66,21 +66,22 @@ type SwaggerConfigComponents struct {
 	DeviceSdkDir      string
 	ApiGateWayHost    string
 	ApiGateWayPort    string
-	Proxy    bool
+	Proxy             bool
+	ProxyPrefix		  string
 	CoreComponents    []ConfiComponent
-	DeviceComponents    []ConfiComponent
+	DeviceComponents  []ConfiComponent
 }
 
 // ConfigurationStruct contains the configuration properties for the core-command service.
 type ConfigurationStruct struct {
-	Writable    WritableInfo
+	Writable WritableInfo
 
 	Clients     map[string]bootstrapConfig.ClientInfo
 	Databases   map[string]bootstrapConfig.Database
 	Registry    bootstrapConfig.RegistryInfo
 	Service     bootstrapConfig.ServiceInfo
 	Swagger     SwaggerConfigComponents
-	KongURL KongUrlInfo
+	KongURL     KongUrlInfo
 	SecretStore bootstrapConfig.SecretStoreInfo
 }
 

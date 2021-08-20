@@ -12,6 +12,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"thundersoft.com/edgex/swagger-ui/internal/config"
@@ -20,8 +21,7 @@ import (
 
 const (
 	place_holder = `<<INSERT-SWAGGER-URLS>>`
-	js_template  =
-		`window.onload = function() {
+	js_template  = `window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
         urls: ` + place_holder + `,
@@ -41,27 +41,24 @@ const (
       window.ui = ui;
     };`
 
-	SwaggerDataRequest ="swagger"
-	SwaggerJsFileName ="edgex-swagger-init.js"
+	SwaggerDataRequest = "swagger"
+	SwaggerJsFileName  = "edgex-swagger-init.js"
 
-	swaggerComponetProperty="components"
-	securitySchemesProperty= "securitySchemes"
-	swaggersecurityProperty="security"
+	swaggerComponetProperty = "components"
+	securitySchemesProperty = "securitySchemes"
+	swaggersecurityProperty = "security"
 
 	defaultSchemaName = "Authorization"
 
 	edgexKongAuth = "ApiKeyAuth"
 
+	EdgexProxyPrefix = "ep"
 )
 
-
-
-
-
 type ApiKeyAuth struct {
-	Type         string `json:"type" :"type"`
-	In        string `json:"in" :"type"`
-	Name      string `json:"name" :"type"`
+	Type string `json:"type" :"type"`
+	In   string `json:"in" :"type"`
+	Name string `json:"name" :"type"`
 }
 
 type swaggerUrl struct {
@@ -74,7 +71,7 @@ type HttpResServer struct {
 	swaggerFileHandler http.Handler
 	prefix             string
 	OpenApiJsonData    map[string]interface{}
-	init bool
+	init               bool
 }
 
 func NewHttpResServer(dic *di.Container) HttpResServer {
@@ -118,168 +115,168 @@ func (hs *HttpResServer) getSwaggerJsonData(writer http.ResponseWriter, request 
 	vars := mux.Vars(request)
 	componetName := vars[common.Name]
 	log.Info(request.RequestURI, componetName)
-	data,ok:=hs.OpenApiJsonData[componetName]
-	if ok{
-		sendResponse(writer,request,"getSwaggerJsonData",log,data,http.StatusOK)
-	}else{
-		sendResponse(writer,request,"getSwaggerJsonData",log,"",http.StatusNotFound)
+	data, ok := hs.OpenApiJsonData[componetName]
+	if ok {
+		sendResponse(writer, request, "getSwaggerJsonData", log, data, http.StatusOK)
+	} else {
+		sendResponse(writer, request, "getSwaggerJsonData", log, "", http.StatusNotFound)
 	}
 }
-
-
 
 func (hs *HttpResServer) Init() {
 	log := bootsrapContainer.LoggingClientFrom(hs.dic.Get)
 	if hs.init {
-		log.Info(fmt.Sprintf("swagger server has been inited"))
+		log.Info(fmt.Sprintf("swagger swaggerServer has been inited"))
 		return
 	}
 
 	config := container.ConfigurationFrom(hs.dic.Get)
 	swagger := config.Swagger
-	serviceHost:="//"+config.Service.Host +":"+ strconv.Itoa(config.Service.Port)
-	server:=serviceHost
-	if swagger.Proxy {
-		log.Info("use proxy mode")
-	} else {
-		server ="//"+ config.KongURL.Server +":"+ strconv.Itoa(config.KongURL.ApplicationPort)
-	}
-	log.Info(fmt.Sprintf("make swagger use base url '%s' proxy mod '%v'", server, swagger.Proxy))
-	// then load yamls
-	coreDir:=swagger.CoreDir
-	dvDir:=swagger.DeviceSdkDir
-	log.Info(fmt.Sprintf("load swagger yamls from dictionary [core]  %s  [deviceSerive template] %s ",coreDir,dvDir))
+	serviceHost := "//" + config.Service.Host + ":" + strconv.Itoa(config.Service.Port)
+	swaggerServer := serviceHost
 
-	if ok,_:=pathExists(coreDir);!ok {
+	if config.Swagger.ProxyPrefix == "" {
+		config.Swagger.ProxyPrefix=EdgexProxyPrefix
+	}
+
+	if swagger.Proxy {
+		swaggerServer = swaggerServer +path.Clean("/"+swagger.ProxyPrefix+"/")
+		log.Info(fmt.Sprintf("use proxy mode %s", swaggerServer))
+	} else {
+		swaggerServer = "//" + config.KongURL.Server + ":" + strconv.Itoa(config.KongURL.ApplicationPort)
+	}
+	log.Info(fmt.Sprintf("make swagger use base url '%s' proxy mod '%v'", swaggerServer, swagger.Proxy))
+	// then load yamls
+	coreDir := swagger.CoreDir
+	dvDir := swagger.DeviceSdkDir
+	log.Info(fmt.Sprintf("load swagger yamls from dictionary [core]  %s  [deviceSerive template] %s ", coreDir, dvDir))
+
+	if ok, _ := pathExists(coreDir); !ok {
 		panic("core dir is not exist")
 	}
-	if ok,_:=pathExists(dvDir);!ok {
+	if ok, _ := pathExists(dvDir); !ok {
 		panic("device service dir is not exist")
 	}
-	hs.OpenApiJsonData=make(map[string]interface{})
-	swaggerUrls:=make([]swaggerUrl,0,len(swagger.CoreComponents)+len(swagger.DeviceComponents))
-	for _,c:=range swagger.CoreComponents{
-		e,s,m:=loadYamls(c,coreDir)
-		if e !=nil{
-			log.Error(fmt.Sprintf("err when load yaml for componets e:= %s, c:= %s",e,c.Name))
+	hs.OpenApiJsonData = make(map[string]interface{})
+	swaggerUrls := make([]swaggerUrl, 0, len(swagger.CoreComponents)+len(swagger.DeviceComponents))
+	for _, c := range swagger.CoreComponents {
+		e, s, m := loadYamls(c, coreDir)
+		if e != nil {
+			log.Error(fmt.Sprintf("err when load yaml for componets e:= %s, c:= %s", e, c.Name))
 			continue
 		}
-		swaggerUrls=append(swaggerUrls,swaggerUrl{
-			Url: serviceHost+"/"+SwaggerDataRequest+"/"+c.Name,
+		swaggerUrls = append(swaggerUrls, swaggerUrl{
+			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m,s,c,server)
-		hs.OpenApiJsonData[c.Name]=m
+		processJson(m, s, c, swaggerServer)
+		hs.OpenApiJsonData[c.Name] = m
 	}
-	for _,c:=range swagger.DeviceComponents{
-		e,s,m:=loadYamls(c,dvDir)
-		if e !=nil{
-			log.Error(fmt.Sprintf("err when load yaml for componets e:= %s, c:= s%",e,c.Name))
+	for _, c := range swagger.DeviceComponents {
+		e, s, m := loadYamls(c, dvDir)
+		if e != nil {
+			log.Error(fmt.Sprintf("err when load yaml for componets e:= %s, c:= s%", e, c.Name))
 			continue
 		}
-		swaggerUrls=append(swaggerUrls,swaggerUrl{
-			Url: serviceHost+"/"+SwaggerDataRequest+"/"+c.Name,
+		swaggerUrls = append(swaggerUrls, swaggerUrl{
+			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m,s,c,server)
-		hs.OpenApiJsonData[c.Name]=m
+		processJson(m, s, c, swaggerServer)
+		hs.OpenApiJsonData[c.Name] = m
 	}
-	e:=genInitJs(swaggerUrls,log,swagger.SwaggerFileDir)
-	if e!=nil {
-		log.Errorf(fmt.Sprintf("error happen when gen edgex swagger javascript %s",e))
+	e := genInitJs(swaggerUrls, log, swagger.SwaggerFileDir)
+	if e != nil {
+		log.Errorf(fmt.Sprintf("error happen when gen edgex swagger javascript %s", e))
 		panic("edgex swagger javascript gen error ")
 	}
-	hs.init=true
+	hs.init = true
 }
-
-type mmaps map[string]map[string]interface{}
-type maps map[string]interface{}
 
 func processJson(m map[string]interface{}, s string, c config.ConfiComponent, server string) {
 	//return
-	var swaggerComponet maps
+	var swaggerComponet map[string]interface{}
 
-	_,ok:=m[swaggerComponetProperty]
-	if   _,o:=m[swaggerComponetProperty].(map[string]interface{});!o || !ok {
-		swaggerComponet=make(maps)
-		m[swaggerComponetProperty]=swaggerComponet
+	_, ok := m[swaggerComponetProperty]
+	if _, o := m[swaggerComponetProperty].(map[string]interface{}); !o || !ok {
+		swaggerComponet = make(map[string]interface{})
+		m[swaggerComponetProperty] = swaggerComponet
 	}
-	swaggerComponet,_=m[swaggerComponetProperty].(map[string]interface{})
-	_,ok = swaggerComponet[securitySchemesProperty]
+	swaggerComponet, _ = m[swaggerComponetProperty].(map[string]interface{})
+	_, ok = swaggerComponet[securitySchemesProperty]
 	if !ok {
-		swaggerComponet[securitySchemesProperty]=make(maps)
+		swaggerComponet[securitySchemesProperty] = make(map[string]interface{})
 	}
-	sc,_:=swaggerComponet[securitySchemesProperty]
-	t,o:= sc.(maps)
-	if o{
-		t[edgexKongAuth]= ApiKeyAuth{
-			Type:"apiKey",
-			In:"header",
-			Name:defaultSchemaName,
+	sc, _ := swaggerComponet[securitySchemesProperty]
+	t, o := sc.(map[string]interface{})
+	if o {
+		t[edgexKongAuth] = ApiKeyAuth{
+			Type: "apiKey",
+			In:   "header",
+			Name: defaultSchemaName,
 		}
 	}
 
-	secs:=make([]interface{},0,10)
-	api:=make(map[string]interface{})
-	api[edgexKongAuth]=make([]string,0,1)
-	secs=append(secs,api)
-	m[swaggersecurityProperty]=secs
+	secs := make([]interface{}, 0, 10)
+	api := make(map[string]interface{})
+	api[edgexKongAuth] = make([]string, 0, 1)
+	secs = append(secs, api)
+	m[swaggersecurityProperty] = secs
 	//m[swaggersecurityProperty]=spv
-	servers:=make([]interface{},0,1)
+	servers := make([]interface{}, 0, 1)
 
-	apiServer:=make(map[string]string)
-	apiServer["url"]=server+"/"+c.Route+"/"+c.ApiVer+"/"
-	apiServer["description"]="kong gate way"
-	servers=append(servers,apiServer)
-	m["servers"]=servers
+	apiServer := make(map[string]string)
+	apiServer["url"] = server + path.Clean("/"+c.Route+"/"+c.ApiVer+"/")
+	apiServer["description"] = "kong gate way"
+	servers = append(servers, apiServer)
+	m["servers"] = servers
 }
 
-func genInitJs(urls []swaggerUrl,l logger.LoggingClient,swaggerDir string) error {
-	us,e:=json.Marshal(urls)
-	if e!=nil {
-		l.Errorf(fmt.Sprintf("error happen when serialize url arry %s",e))
+func genInitJs(urls []swaggerUrl, l logger.LoggingClient, swaggerDir string) error {
+	us, e := json.Marshal(urls)
+	if e != nil {
+		l.Errorf(fmt.Sprintf("error happen when serialize url arry %s", e))
 		return e
 	}
-	l.Info(fmt.Sprintf("swagger ui urls %s",us))
-	wf:=swaggerDir+string(os.PathSeparator)+SwaggerJsFileName
-	if _,e:=os.Stat(wf);e==nil{
-		e=os.Remove(wf)
-		if e!=nil {
-			l.Errorf(fmt.Sprintf("can note remove exist file %s %s",wf,e))
+	l.Info(fmt.Sprintf("swagger ui urls %s", us))
+	wf := swaggerDir + string(os.PathSeparator) + SwaggerJsFileName
+	if _, e := os.Stat(wf); e == nil {
+		e = os.Remove(wf)
+		if e != nil {
+			l.Errorf(fmt.Sprintf("can note remove exist file %s %s", wf, e))
 			return e
 		}
 	}
 
-	js:=strings.Replace(js_template,place_holder,string(us),1)
-	e=os.WriteFile(wf,[]byte(js),fs.ModePerm)
+	js := strings.Replace(js_template, place_holder, string(us), 1)
+	e = os.WriteFile(wf, []byte(js), fs.ModePerm)
 	return e
 }
 
-func loadYamls(c config.ConfiComponent,dir string) (error,string, map[string]interface{}){
+func loadYamls(c config.ConfiComponent, dir string) (error, string, map[string]interface{}) {
 	//files,err:=os.ReadDir(dir)
 	//if err!=nil{
 	//	return err,nil
 	//}
-	fp:=dir+string(os.PathSeparator)+c.FileName
-	result:=make(map[string]interface{})
-	_,e:=os.Stat(fp)
-	if e!=nil{
-		return e,"",nil
+	fp := dir + string(os.PathSeparator) + c.FileName
+	result := make(map[string]interface{})
+	_, e := os.Stat(fp)
+	if e != nil {
+		return e, "", nil
 	}
-	b,e:=os.ReadFile(fp)
-	if e!=nil{
-		return e,"",nil
+	b, e := os.ReadFile(fp)
+	if e != nil {
+		return e, "", nil
 	}
-	yaml.Unmarshal(b,result)
+	yaml.Unmarshal(b, result)
 
-	server:=""
-	if c.Host!="" {
-		server=c.Host+c.Port
+	server := ""
+	if c.Host != "" {
+		server = c.Host + c.Port
 	}
 
-	return nil,server,result
+	return nil, server, result
 }
-
 
 func pathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -292,9 +289,8 @@ func pathExists(path string) (bool, error) {
 	return false, err
 }
 
-
 // sendResponse puts together the response packet for the V2 API
-func  sendResponse(
+func sendResponse(
 	writer http.ResponseWriter,
 	request *http.Request,
 	api string,
@@ -322,4 +318,3 @@ func  sendResponse(
 		return
 	}
 }
-

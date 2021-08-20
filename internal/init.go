@@ -12,13 +12,13 @@ import (
 // Bootstrap  contains references to dependencies required by the BootstrapHandler.
 // template code from edgex core
 type Bootstrap struct {
-	router     *mux.Router
+	router *mux.Router
 }
 
 // NewBootstrap is a factory method that returns an initialized Bootstrap receiver struct.
-func NewBootstrap(router *mux.Router ) *Bootstrap {
+func NewBootstrap(router *mux.Router) *Bootstrap {
 	return &Bootstrap{
-		router:     router,
+		router: router,
 	}
 }
 

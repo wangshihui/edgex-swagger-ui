@@ -105,7 +105,6 @@ func DeviceClientFrom(get di.Get) interfaces.DeviceClient {
 	return get(DeviceClientName).(interfaces.DeviceClient)
 }
 
-
 // ConfigurationName contains the name of command's config.ConfigurationStruct implementation in the DIC.
 var ConfigurationName = di.TypeInstanceToName(config.ConfigurationStruct{})
 

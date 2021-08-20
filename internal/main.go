@@ -53,5 +53,3 @@ func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
 			handlers.NewStartMessage("edgex-swagger-ui-security", edgex.Version).BootstrapHandler,
 		})
 }
-
-
