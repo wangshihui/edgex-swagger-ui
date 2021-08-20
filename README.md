@@ -103,9 +103,10 @@ Host="core-command"  # the component runtime server host
 
 
 ## demo
-[edgex-swagger-ui.png](./imges/edgex-swagger-ui.png)
-
+![edgex-swagger-ui.png](./imges/edgex-swagger-ui.png)
 
 support kong jwt token
+Note when use kong as the swagger api's server,need a plugin to support  the cros  eg [kong cros plugin](https://docs.konghq.com/hub/kong-inc/cors/)
 
-[Authorization](./imges/Authorization.png)
+
+![Authorization](./imges/Authorization.png)
