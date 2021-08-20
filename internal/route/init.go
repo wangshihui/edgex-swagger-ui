@@ -15,7 +15,7 @@ func LoadRestRoutes(router *mux.Router, dic *di.Container) {
 	sv.AddHttpSwaggerJsonHandler(router)
 
 	config := container.ConfigurationFrom(dic.Get)
-	if config.Swagger.Proxy {
+	if config.Swagger.ReverseProxy {
 		revers := reverse.NewEdgexReversProxy(dic)
 		revers.AddReversProxy(router)
 	}

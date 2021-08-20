@@ -23,9 +23,7 @@ SwaggerPathPrefix="/edgex-swagger-ui/"
 SwaggerFileDir="swagger-ui"
 CoreDir="openapi/core/v2"
 DeviceSdkDir="openapi/device-sdk/v2"
-ApiGateWayHost="localhost"
-ApiGateWayPort = "8000"
-Proxy = true
+ReverseProxy = true
 ProxyPrefix= "proxy"
 
 [[Swagger.CoreComponents]]

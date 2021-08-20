@@ -139,13 +139,13 @@ func (hs *HttpResServer) Init() {
 		config.Swagger.ProxyPrefix = EdgexProxyPrefix
 	}
 
-	if swagger.Proxy {
+	if swagger.ReverseProxy {
 		swaggerServer = swaggerServer + path.Clean("/"+swagger.ProxyPrefix+"/")
 		log.Info(fmt.Sprintf("use proxy mode %s", swaggerServer))
 	} else {
 		swaggerServer = "//" + config.KongURL.Server + ":" + strconv.Itoa(config.KongURL.ApplicationPort)
 	}
-	log.Info(fmt.Sprintf("make swagger use base url '%s' proxy mod '%v'", swaggerServer, swagger.Proxy))
+	log.Info(fmt.Sprintf("make swagger use base url '%s' proxy mod '%v'", swaggerServer, swagger.ReverseProxy))
 	// then load yamls
 	coreDir := swagger.CoreDir
 	dvDir := swagger.DeviceSdkDir
@@ -169,7 +169,7 @@ func (hs *HttpResServer) Init() {
 			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m, s, c, swaggerServer, swagger.Proxy)
+		processJson(m, s, c, swaggerServer, swagger.ReverseProxy)
 		hs.OpenApiJsonData[c.Name] = m
 	}
 	for _, c := range swagger.DeviceComponents {
@@ -182,7 +182,7 @@ func (hs *HttpResServer) Init() {
 			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m, s, c, swaggerServer, swagger.Proxy)
+		processJson(m, s, c, swaggerServer, swagger.ReverseProxy)
 		hs.OpenApiJsonData[c.Name] = m
 	}
 	e := genInitJs(swaggerUrls, log, swagger.SwaggerFileDir)

@@ -64,9 +64,7 @@ type SwaggerConfigComponents struct {
 	CoreDir           string
 	SwaggerFileDir    string
 	DeviceSdkDir      string
-	ApiGateWayHost    string
-	ApiGateWayPort    string
-	Proxy             bool
+	ReverseProxy      bool
 	ProxyPrefix       string
 	CoreComponents    []ConfiComponent
 	DeviceComponents  []ConfiComponent
