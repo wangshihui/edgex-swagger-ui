@@ -136,11 +136,11 @@ func (hs *HttpResServer) Init() {
 	swaggerServer := serviceHost
 
 	if config.Swagger.ProxyPrefix == "" {
-		config.Swagger.ProxyPrefix=EdgexProxyPrefix
+		config.Swagger.ProxyPrefix = EdgexProxyPrefix
 	}
 
 	if swagger.Proxy {
-		swaggerServer = swaggerServer +path.Clean("/"+swagger.ProxyPrefix+"/")
+		swaggerServer = swaggerServer + path.Clean("/"+swagger.ProxyPrefix+"/")
 		log.Info(fmt.Sprintf("use proxy mode %s", swaggerServer))
 	} else {
 		swaggerServer = "//" + config.KongURL.Server + ":" + strconv.Itoa(config.KongURL.ApplicationPort)
@@ -169,7 +169,7 @@ func (hs *HttpResServer) Init() {
 			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m, s, c, swaggerServer)
+		processJson(m, s, c, swaggerServer, swagger.Proxy)
 		hs.OpenApiJsonData[c.Name] = m
 	}
 	for _, c := range swagger.DeviceComponents {
@@ -182,7 +182,7 @@ func (hs *HttpResServer) Init() {
 			Url:  serviceHost + path.Clean("/"+SwaggerDataRequest+"/"+c.Name),
 			Name: c.Name,
 		})
-		processJson(m, s, c, swaggerServer)
+		processJson(m, s, c, swaggerServer, swagger.Proxy)
 		hs.OpenApiJsonData[c.Name] = m
 	}
 	e := genInitJs(swaggerUrls, log, swagger.SwaggerFileDir)
@@ -193,7 +193,7 @@ func (hs *HttpResServer) Init() {
 	hs.init = true
 }
 
-func processJson(m map[string]interface{}, s string, c config.ConfiComponent, server string) {
+func processJson(m map[string]interface{}, s string, c config.ConfiComponent, server string, proxy bool) {
 	//return
 	var swaggerComponet map[string]interface{}
 
@@ -227,7 +227,10 @@ func processJson(m map[string]interface{}, s string, c config.ConfiComponent, se
 
 	apiServer := make(map[string]string)
 	apiServer["url"] = server + path.Clean("/"+c.Route+"/"+c.ApiVer+"/")
-	apiServer["description"] = "kong gate way"
+	apiServer["description"] = " Use Kong GateWay"
+	if proxy {
+		apiServer["description"] = "Use Local ReversProxy"
+	}
 	servers = append(servers, apiServer)
 	m["servers"] = servers
 }

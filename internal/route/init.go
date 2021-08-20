@@ -16,7 +16,7 @@ func LoadRestRoutes(router *mux.Router, dic *di.Container) {
 
 	config := container.ConfigurationFrom(dic.Get)
 	if config.Swagger.Proxy {
-		revers:=reverse.NewEdgexReversProxy(dic)
+		revers := reverse.NewEdgexReversProxy(dic)
 		revers.AddReversProxy(router)
 	}
 

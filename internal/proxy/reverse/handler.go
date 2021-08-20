@@ -17,7 +17,6 @@ import (
 )
 
 type proxyServers struct {
-
 }
 
 type EdgexReversProxy struct {
@@ -26,23 +25,22 @@ type EdgexReversProxy struct {
 	reversProxy  http.Handler
 }
 
-
 func NewEdgexReversProxy(dic *di.Container) *EdgexReversProxy {
 	proxyServers := make(map[string][]*url.URL)
 
 	config := container.ConfigurationFrom(dic.Get)
 
-	ccn:=len(config.Swagger.CoreComponents)
+	ccn := len(config.Swagger.CoreComponents)
 
 	if ccn > 0 {
-		for _,c:=range config.Swagger.CoreComponents{
+		for _, c := range config.Swagger.CoreComponents {
 			produceProxyServers(c, proxyServers, config)
 		}
 	}
 	dcn := len(config.Swagger.DeviceComponents)
 
 	if dcn > 0 {
-		for _,c:=range config.Swagger.DeviceComponents{
+		for _, c := range config.Swagger.DeviceComponents {
 			produceProxyServers(c, proxyServers, config)
 		}
 	}
@@ -50,7 +48,7 @@ func NewEdgexReversProxy(dic *di.Container) *EdgexReversProxy {
 	return &EdgexReversProxy{
 		dic:          dic,
 		proxyServers: proxyServers,
-		reversProxy:  reverseProxy(proxyServers, dic,config.Swagger.ProxyPrefix),
+		reversProxy:  reverseProxy(proxyServers, dic, config.Swagger.ProxyPrefix),
 	}
 }
 
@@ -72,15 +70,13 @@ func produceProxyServers(c config.ConfiComponent, proxyServers map[string][]*url
 	proxyServers[path.Clean("/"+config.Swagger.ProxyPrefix+"/"+c.Route+"/")] = urls
 }
 
-
 func (p EdgexReversProxy) AddReversProxy(router *mux.Router) {
-	for n,_:= range p.proxyServers{
+	for n, _ := range p.proxyServers {
 		router.PathPrefix(n).Handler(p.reversProxy)
 	}
 }
 
-
-func reverseProxy(ProxyServers map[string][]*url.URL, dic *di.Container,prefix string) *httputil.ReverseProxy {
+func reverseProxy(ProxyServers map[string][]*url.URL, dic *di.Container, prefix string) *httputil.ReverseProxy {
 	log := bootsrapContainer.LoggingClientFrom(dic.Get)
 	director := func(req *http.Request) {
 		if ProxyServers == nil {
@@ -88,9 +84,9 @@ func reverseProxy(ProxyServers map[string][]*url.URL, dic *di.Container,prefix s
 		} else {
 			reqPath := req.URL.Path
 			for n, urls := range ProxyServers {
-				if strings.Index(reqPath,n) == 0 {
+				if strings.Index(reqPath, n) == 0 {
 					t := urls[rand.Int()%len(urls)]
-					toPath:= strings.Replace(reqPath,n,"",1)
+					toPath := strings.Replace(reqPath, n, "", 1)
 					req.URL.Scheme = t.Scheme
 					req.URL.Host = t.Host
 					req.URL.Path = path.Clean(toPath)

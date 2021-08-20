@@ -67,7 +67,7 @@ type SwaggerConfigComponents struct {
 	ApiGateWayHost    string
 	ApiGateWayPort    string
 	Proxy             bool
-	ProxyPrefix		  string
+	ProxyPrefix       string
 	CoreComponents    []ConfiComponent
 	DeviceComponents  []ConfiComponent
 }
