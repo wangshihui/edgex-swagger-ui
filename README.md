@@ -49,13 +49,13 @@ RequestTimeout = '5s'
 ## swagger config 
 swagger componet config
 the entry path of swagger ui wille be
-
 `{serice.host}:{service.port}/{swagger.PathPrefix}`
 
 for the default is ：
 
 > http://localhost:8080/edgex-swagger-ui
 
+the swagger ui refer to [swagger-ui](https://swagger.io/tools/swagger-ui/)
 
 ```toml
 [Swagger]
