@@ -34,11 +34,11 @@ import (
 )
 
 const (
-	place_holder = `<<INSERT-SWAGGER-URLS>>`
-	js_template  = `window.onload = function() {
+	placeHolder = `<<INSERT-SWAGGER-URLS>>`
+	jsTemplate  = `window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        urls: ` + place_holder + `,
+        urls: ` + placeHolder + `,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -58,9 +58,9 @@ const (
 	SwaggerDataRequest = "swagger"
 	SwaggerJsFileName  = "edgex-swagger-init.js"
 
-	swaggerComponetProperty = "components"
-	securitySchemesProperty = "securitySchemes"
-	swaggersecurityProperty = "security"
+	swaggerComponentsProperty = "components"
+	securitySchemesProperty   = "securitySchemes"
+	swaggerSecurityProperty   = "security"
 
 	defaultSchemaName = "Authorization"
 
@@ -70,9 +70,9 @@ const (
 )
 
 type ApiKeyAuth struct {
-	Type string `json:"type" :"type"`
-	In   string `json:"in" :"type"`
-	Name string `json:"name" :"type"`
+	Type string `json:"type"`
+	In   string `json:"in" `
+	Name string `json:"name"`
 }
 
 type swaggerUrl struct {
@@ -211,12 +211,12 @@ func processJson(m map[string]interface{}, s string, c config.ConfiComponent, se
 	//return
 	var swaggerComponet map[string]interface{}
 
-	_, ok := m[swaggerComponetProperty]
-	if _, o := m[swaggerComponetProperty].(map[string]interface{}); !o || !ok {
+	_, ok := m[swaggerComponentsProperty]
+	if _, o := m[swaggerComponentsProperty].(map[string]interface{}); !o || !ok {
 		swaggerComponet = make(map[string]interface{})
-		m[swaggerComponetProperty] = swaggerComponet
+		m[swaggerComponentsProperty] = swaggerComponet
 	}
-	swaggerComponet, _ = m[swaggerComponetProperty].(map[string]interface{})
+	swaggerComponet, _ = m[swaggerComponentsProperty].(map[string]interface{})
 	_, ok = swaggerComponet[securitySchemesProperty]
 	if !ok {
 		swaggerComponet[securitySchemesProperty] = make(map[string]interface{})
@@ -235,8 +235,8 @@ func processJson(m map[string]interface{}, s string, c config.ConfiComponent, se
 	api := make(map[string]interface{})
 	api[edgexKongAuth] = make([]string, 0, 1)
 	secs = append(secs, api)
-	m[swaggersecurityProperty] = secs
-	//m[swaggersecurityProperty]=spv
+	m[swaggerSecurityProperty] = secs
+	//m[swaggerSecurityProperty]=spv
 	servers := make([]interface{}, 0, 1)
 
 	apiServer := make(map[string]string)
@@ -265,7 +265,7 @@ func genInitJs(urls []swaggerUrl, l logger.LoggingClient, swaggerDir string) err
 		}
 	}
 
-	js := strings.Replace(js_template, place_holder, string(us), 1)
+	js := strings.Replace(jsTemplate, placeHolder, string(us), 1)
 	e = os.WriteFile(wf, []byte(js), fs.ModePerm)
 	return e
 }
