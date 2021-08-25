@@ -20,9 +20,9 @@ StatusPort = 8001
 
 [Swagger]
 SwaggerPathPrefix="/edgex-swagger-ui/"
-SwaggerFileDir="swagger-ui"
-CoreDir="openapi/core/v2"
-DeviceSdkDir="openapi/device-sdk/v2"
+SwaggerFileDir="res/swagger-ui"
+CoreDir="res/openapi/core/v2"
+DeviceSdkDir="res/openapi/device-sdk/v2"
 ReverseProxy = true
 ProxyPrefix= "proxy"
 

@@ -1,12 +1,12 @@
 # Swagger UI For Edgex
 
-Use swagger ui to render the edgex open API definitions ,for developer to test the edgex apis in development or loacl edgex runtime enviroments
+Use swagger ui to render the edgex open API definitions ,for developer to test the edgex apis in development or local edgex runtime environments
 
 
 the edgex ui is enough for most use case of edgex. This  module is  For learning  edgex or development. 
 
 ## online open api
-the online edgex apis can refer to ,replace the `name` variable to the edgex componet name.
+the online edgex apis can refer to ,replace the `name` variable to the edgex component name.
 
 > https://app.swaggerhub.com/apis-docs/EdgeXFoundry1/{name}/2.0.0
 
@@ -28,9 +28,10 @@ use the `go-mod-bootstrap` module in the program main entry as most  edgex modul
 
 so the configuration file is  [configuration.toml](./cmd/res/configuration.toml)
 
-and can also use `--confdir` but `-c` not available, also all the config can be 
+And can also use `--confdir` but `-c` not available, also all the config can be 
 
 override by the ENV  value.
+
 
 ### service 
 value may be need to change is  `Port`  
@@ -47,8 +48,8 @@ RequestTimeout = '5s'
 ```
 
 ## swagger config 
-swagger componet config
-the entry path of swagger ui wille be
+swagger component config
+the entry path of swagger ui will be
 `{serice.host}:{service.port}/{swagger.PathPrefix}`
 
 for the default is ：
@@ -69,7 +70,7 @@ ProxyPrefix= "proxy" # reverse proxy path prefix
 
 ## kong 
 
-gate way config 
+gateway config 
 
 ```toml
 [KongURL]
@@ -82,7 +83,7 @@ StatusPort = 8001
 
 ```
 
-## swagger componets
+## swagger components
 if ` Swagger.ReverseProxy` was set to false then will use the kong
 as the swagger server url attr.
 
@@ -100,6 +101,30 @@ FileName="core-command.yaml" # the open api define from edgex source code
 Port="59882" # the component runtime server Port 
 Host="core-command"  # the component runtime server host 
 ```
+## start
+the main func
+>  [main.go](./cmd/main.go)
+
+start
+
+> go build -o edgex-swagger-ui main.go
+>
+> ./edgex-swagger-ui
+
+
+if start from source code, eg debug in `idea`. Modify config 
+```toml
+[Swagger]
+SwaggerPathPrefix="/edgex-swagger-ui/" # swagger ui 的请求路径
+SwaggerFileDir="cmd/res/swagger-ui" # swagger的静态文件
+CoreDir="cmd/res/openapi/core/v2" # edgex核心模块的open api位置。
+DeviceSdkDir="cmd/res/openapi/device-sdk/v2" # device service 的open api位置
+ReverseProxy = true #  是否开启反向代理,不开启的话会 将swagger的 所有try it 的请求发送到kong 网关
+ProxyPrefix= "proxy" # 反向代理的请求路径
+```
+add variables in cmd line
+> --confdir="cmd/res/"
+
 
 
 ## demo
