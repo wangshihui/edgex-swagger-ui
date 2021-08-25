@@ -95,14 +95,14 @@ StatusPort = 8001
 
 ```toml
 [[Swagger.CoreComponents]]
-Scheme="" # http default
-Enable=true # not use it now
-Route="core-command" # routeName in kong or local reversproxy
-ApiVer="/api/v2" # will be add to the swagger server url to 
-Name="core-command" # identifier of the open api,same to the open api modul
-FileName="core-command.yaml" # the open api define from edgex source code 
-Port="59882" # the component runtime server Port 
-Host="core-command"  # the component runtime server host 
+Scheme="" # 被代理服务的协议 默认http
+Enable=true # 是否开启这个模块 默认true
+Route="core-command" # 在kong或者反向代理中使用的路由名称
+ApiVer="/api/v2" #  edgex 模块会有一个apiversion 的前缀
+Name="core-command" # 模块的唯一标识,用于在swagger ui中显示
+FileName="core-command.yaml" # openapi文件名称
+Port="59882" # 模块服务的端口号
+Host="core-command"  # 模块所在的主机名称可以是ip地址
 ```
 
 

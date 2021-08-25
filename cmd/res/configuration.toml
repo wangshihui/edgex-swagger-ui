@@ -18,13 +18,21 @@ ApplicationPort = 8000
 ApplicationPortSSL = 8443
 StatusPort = 8001
 
+#[Swagger]
+#SwaggerPathPrefix="/edgex-swagger-ui/"
+#SwaggerFileDir="res/swagger-ui"
+#CoreDir="res/openapi/core/v2"
+#DeviceSdkDir="res/openapi/device-sdk/v2"
+#ReverseProxy = true
+#ProxyPrefix= "proxy"
+
 [Swagger]
-SwaggerPathPrefix="/edgex-swagger-ui/"
-SwaggerFileDir="res/swagger-ui"
-CoreDir="res/openapi/core/v2"
-DeviceSdkDir="res/openapi/device-sdk/v2"
-ReverseProxy = true
-ProxyPrefix= "proxy"
+SwaggerPathPrefix="/edgex-swagger-ui/" # swagger ui 的请求路径
+SwaggerFileDir="cmd/res/swagger-ui" # swagger的静态文件
+CoreDir="cmd/res/openapi/core/v2" # edgex核心模块的open api位置。
+DeviceSdkDir="cmd/res/openapi/device-sdk/v2" # device service 的open api位置
+ReverseProxy = true #  是否开启反向代理,不开启的话会 将swagger的 所有try it 的请求发送到kong 网关
+ProxyPrefix= "proxy" # 反向代理的请求路径
 
 [[Swagger.CoreComponents]]
 Scheme=""

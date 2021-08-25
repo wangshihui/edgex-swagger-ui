@@ -7,14 +7,8 @@ info:
 servers:
   - url: http://localhost:59882/api/v2
     description: URL for local development and testing
-security:
-  - ApiKeyAuth: []
+  
 components:
-  securitySchemes:
-    ApiKeyAuth:        # arbitrary name for the security scheme
-      type: apiKey
-      in: header       # can be "header", "query" or "cookie"
-      name: X-API-KEY
   schemas:
     BaseRequest:
       description: "Defines basic properties which all use-case specific request DTO instances should support."

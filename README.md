@@ -135,3 +135,6 @@ Note when use kong as the swagger api's server,need a plugin to support  the cro
 
 
 ![Authorization](./imges/Authorization.png)
+
+
+![demo](./imges/demo.gif)
